@@ -1,0 +1,405 @@
+--- Day 2
+
+create database db2;
+
+use db2;
+
+CREATE TABLE if not EXISTS employee
+(
+	id INT,
+    name VARCHAR(50),
+    address VARCHAR(50),
+    city VARCHAR(50)
+);
+
+insert into employee values(1, 'Shamm', 'RJPM', 'Luck');
+Select * from employee;
+--- Alter command to add new column
+alter table employee add DOB date;
+
+--- Change the datatype of existing column
+alter table employee modify column address varchar(100);
+
+show create table employee;
+
+--- Delete existing column
+alter table employee drop column city;
+
+select * from employee;
+
+CREATE TABLE if not EXISTS employee_tmp
+(
+	id INT,
+    name VARCHAR(50),
+    age INT,
+    hiring_date DATE,
+    salary int,
+    city VARCHAR(50)
+);
+
+insert into employee_tmp values(1, 'Sham', 28, '2021-09-21', 1000, 'LKO'),
+(2, 'Ketan', 28, '2021-09-21', 2000, 'LKO');
+
+--- Add constraint using alter command
+alter table employee_tmp add constraint unique_id UNIQUE(id);
+
+--- Fail Duplicate entry '1' for key 'employee_tmp.unique_id'
+insert into employee_tmp values(1, 'Sham', 28, '2021-09-21', 1000, 'LKO');
+
+--- How to delete constraint
+alter table employee_tmp drop constraint unique_id;
+
+--- Success 
+insert into employee_tmp values(1, 'Sham', 28, '2021-09-21', 1000, 'LKO');
+
+--- create table with primary key
+create table customer
+(
+cust_id int,
+name VARCHAR(50),
+age int,
+constraint pk Primary Key(cust_id)
+);
+
+
+--- create table with foreign key
+create table orders
+(
+order_id int,
+order_num int,
+customer_id int,
+name VARCHAR(50),
+age int,
+constraint pk Primary Key(order_id),
+constraint fk FOREIGN KEY (customer_id) REFERENCES customer(cust_id)
+);
+--- this column(customer_id) is reference of some column which is present in above
+--- above column
+
+
+--- Difference between drop and truncate(truncate only remove the content/data 
+--- not the schema or structure of table.)
+select * from employee;
+
+truncate table employee;
+
+drop table employee;
+
+--- DQL Part
+--- Total rows in a table
+--- Whatever we are going to put in count() is not going to affect our output.
+--- whatever we put in here works like a marker and is in front of every row
+--- and count it.
+Select count(*) from employee_tmp;
+
+--- Fetch specific number of columns (This is one of the ways of optimizing SQL Queries)
+--- because  by select(*) we are pulling more and more data to process
+Select name, age from employee_tmp;
+
+--- Give alias name to columns
+Select name as employee_name,
+salary as employee_salary from employee_tmp;
+
+--- Get distinct values of a column
+select distinct(name) as unq_emp_names from employee_tmp;
+
+--- Calling functions in a nested way
+select count(distinct(name)) as dist_emp_count from employee_tmp;
+
+
+--- How to derive new column
+select name,
+	   salary as old_salary,
+       (salary + 1000) as new_salary
+from employee_tmp;
+
+select * from employee_tmp;
+
+--- Small glimple of data filtration
+--- How to filter the data in sql or where clause
+select * from employee_tmp where salary > 1500;
+
+
+--- How to update the existing data in a table
+update employee_tmp set salary = 3000 WHERE salary > 1500;
+select * from employee_tmp;
+
+--- update multiple columns
+update employee_tmp set age = 29, hiring_date = '2022-10-15' 
+where name = 'Sham'; 
+
+--- full update 
+update employee_tmp set salary = 5000;
+
+--- How to see specific set of data
+select * from employee_tmp limit 1;
+
+update employee_tmp set salary = 3000 where name='Sham';
+
+
+--- How to arrange the data in specific order
+select * from employee_tmp order by salary;
+select * from employee_tmp order by salary desc;
+
+truncate table employee_tmp;
+insert into employee_tmp values(1, 'Sham', 28, '2021-09-21', 1000, 'LKO');
+insert into employee_tmp values(2, 'Amit', 29, '2021-10-20', 1000, 'LKO');
+insert into employee_tmp values(3, 'Hari', 30, '2021-09-19', 2000, 'LKO');
+
+
+--- Ordering on Multiple Columns
+select *  from employee_tmp order by salary desc, age desc;
+
+--- Where clause with conditional operators, >, <, <=, >=
+select * from employee_tmp where salary >1500;
+select * from employee_tmp where salary >=1500;
+select * from employee_tmp where salary <1500;
+select * from employee_tmp where salary <=1500;
+
+--- There are two ways either to negate or to select specific things
+--- Not Equal to condition
+select * from employee_tmp where salary !=2000;
+select * from employee_tmp where salary <> 2000;
+
+
+--- Where Clause with logical operators, AND, OR, NOT
+select * from employee_tmp;
+
+--- AND Condition
+select * from employee_tmp where name='Amit' and hiring_date = '2021-10-20';
+
+--- OR Condition
+select * from employee_tmp where hiring_date = '2023-01-01' or salary = 1000;
+
+select * from employee_tmp where hiring_date = '2023-01-01' and salary = 1000;
+
+--- Use of BETWEEN operation with where clause (used for range type or date type)
+select * from employee_tmp where hiring_date between '2021-01-01' and '2021-09-30';
+
+
+
+--- Pattern matching based filter in SQL
+--- use of LIKE operation
+--- characters for pattern matching, _(underscore) means only 1 character
+--- % means zero or more than zero characters
+
+insert into employee_tmp values(4, 'Shady', 20, '2021-11-23', 6000, 'USA');
+insert into employee_tmp values(4, 'Ali', 20, '2021-12-20', 7000, 'NYK');
+
+select * from employee_tmp;
+--- filter all records where employee name is starting from capital S
+
+select * from employee_tmp where name like 'S%';
+
+--- filter all records which starts from letter S and only having
+--- 5 chars on their name
+select * from employee_tmp where name like 'S____';
+
+--- filter all the records which ends with K
+select * from employee_tmp where name like '%y';
+
+--- filter all the records where name is atleast 5 character long
+select * from employee_tmp where name like '_____%';
+
+insert into employee_tmp values(10, 'Mehak', 20, '2021-11-23', null, 'USA');
+insert into employee_tmp values(11, 'Nihay', 20, '2021-11-25', null, 'USA');
+
+--- How to filter null based records
+select * from employee_tmp where salary is null;
+
+select * from employee_tmp where salary is not null;
+
+
+--- GROUP BY in SQL
+
+create table orders_data
+(
+cust_id int,
+order_id int,
+country VARCHAR(20),
+state VARCHAR(50)
+);
+
+insert into orders_data values(1, 100, 'USA', 'Seattle');
+insert into orders_data values(2, 101, 'INDIA', 'UP');
+insert into orders_data values(3, 102, 'INDIA', 'Delhi');
+insert into orders_data values(4, 108, 'USA', 'WDC');
+insert into orders_data values(5, 109, 'UK', 'London');
+insert into orders_data values(4, 112, 'USA', 'WDC');
+insert into orders_data values(3, 120, 'INDIA', 'AP');
+insert into orders_data values(2, 121, 'INDIA', 'GOA');
+insert into orders_data values(1, 131, 'USA', 'Seattle');
+insert into orders_data values(6, 142, 'USA', 'Seattle');
+insert into orders_data values(7, 150, 'USA', 'Seattle');
+
+select * from orders_data;
+
+--- Grouping means you are creating chunks(of what ever columns you have mentioned in groupby)  
+--- based on the column value and for that u are doing some operation
+
+--- what ever columns you are mentioning in the group by those you can print in the 
+--- final ouput apart from that whatever are the remaning columns you can only apply the
+--- aggregation function on top of it, apart from it you can not use those columns.
+
+--- total orders from each country (mean apply groupby to country)
+select
+country,
+count(*) as country_wise_orders
+from orders_data
+group by country;
+
+
+--- Fail Error Code Expression #2 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'db2.orders_data.order_id' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by	0.0031 sec
+
+select
+country,
+order_id,
+count(*) as country_wise_orders
+from orders_data
+group by country;
+
+select * from employee_tmp;
+
+--- Do multiple aggregation in Group BY
+select
+age,
+sum(salary) as sum_salary_for_each_age,
+avg(salary) as avg_salary_for_each_age,
+min(salary) as min_salary_for_each_age,
+max(salary) as max_salary_for_each_age,
+count(*) as count_emp_for_each_age
+from employee_tmp
+where salary is not null
+group by age;
+
+
+select * from orders_data order by country;
+
+--- Using having cluse with group by
+select
+country,
+count(*) as country_wise_orders
+from orders_data
+group by country having count(*)<5;
+
+--- How to use GROUP_CONCAT
+select
+	 country,
+     GROUP_CONCAT(state) as states_in_country
+from orders_data
+group by country;
+
+select
+	 country,
+     GROUP_CONCAT(distinct state) as states_in_country
+from orders_data
+group by country;
+
+select
+	 country,
+     GROUP_CONCAT(distinct state order by state desc) as states_in_country
+from orders_data
+group by country;
+
+--- Concat mainly works for Strings not Integers
+
+select
+	 country,
+     GROUP_CONCAT(distinct state order by state desc separator '<-->') as states_in_country
+from orders_data
+group by country;
+
+
+--- implement ccase wwhen statement in s q l
+select 
+	 name,
+     salary,
+     case when salary >= 5000 then 'A'
+          when salary < 5000 and salary >= 2500 then 'B'
+          when salary > 0 and salary < 2500 then 'C'
+          else 'N/A' end as emp_grade
+from employee_tmp;
+
+--- Joins in SQL
+create table orders_tmp
+(
+  order_id int,
+  cust_id int,
+  order_date date,
+  shipper_id INT
+  );
+  
+  create table customerss
+(
+  customer_id int,
+  cust_name varchar(50),
+  country varchar(50)
+  );
+  
+  create table shipperss
+(
+  ship_id int,
+  shipper_name varchar(50)
+  );
+  
+  insert into orders_tmp values(10308, 2, '2022-09-15', 3);
+  insert into orders_tmp values(10309, 30, '2022-09-16', 1);
+  insert into orders_tmp values(10310, 41, '2022-09-19', 2);
+  
+insert into customerss values(1, 'Neel', 'India'); 
+insert into customerss values(2, 'Nitino', 'USA');
+insert into customerss values(3, 'Mogambo', 'UK');
+  
+insert into shipperss values(3, 'EA Sports');
+insert into shipperss values(1, 'AE Cars');
+
+
+
+--- Inner Join
+--- We will get those records in the output for which match was found
+
+select
+	od.*,
+    c.*
+from orders_tmp od
+inner join customerss c on od.cust_id = c.customer_id;
+
+
+--- Left Join
+
+select
+	od.*,
+    c.*
+from orders_tmp od
+left join customerss c on od.cust_id = c.customer_id;
+
+-- L R
+-- 2 2
+--   2
+--   
+-- output
+-- 2, 2
+-- 2, 2
+
+-- m records in Left
+-- n records in Right
+
+-- output records = m * n(inner join)
+
+--- Right Join
+
+select
+	od.*,
+    c.*
+from orders_tmp od
+right join customerss c on od.cust_id = c.customer_id;
+
+
+-- What if we need to join more than 2 tables..
+select
+	od.*,
+    c.*,
+    s.*
+from orders_tmp od
+inner join customerss c on od.cust_id = c.customer_id
+inner join shipperss s on s.ship_id = od.shipper_id;
